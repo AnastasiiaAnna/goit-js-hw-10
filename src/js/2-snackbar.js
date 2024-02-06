@@ -1,44 +1,44 @@
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
-import iconClose from '../img/bi_x-octagon.png';
-import iconOk from '../img/bi_check2-circle.svg';
 
 const form = document.querySelector('.form');
-const submitBtn = document.querySelector('[type="submit"]');
+const input = form.querySelector('label > input');
+let delay;
+input.addEventListener('input', e => {
+  delay = e.currentTarget.value;
+});
 
-form.addEventListener('submit', function (event) {
-  event.preventDefault();
+form.addEventListener('submit', e => {
+  e.preventDefault();
 
-  const delay = Number(document.querySelector('[name="delay"]').value);
-  const state = document.querySelector('[name="state"]:checked');
+  function promise(delay, state) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (state === 'fulfilled') {
+          resolve(delay);
+        } else {
+          reject(delay);
+        }
+      }, delay);
+    });
+  }
 
-  const promise = new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (state.value === 'fulfilled') {
-        resolve(delay);
-      } else {
-        reject(delay);
-      }
-    }, delay);
-  });
-
-  promise
-    .then(delay => {
-      iziToast.success({
-        message: `Fulfilled promise in ${delay}ms`,
-        messageColor: '#FFF',
+  promise(delay, form.elements.state.value)
+    .then(value => {
+      iziToast.show({
+        message: `✅ Fulfilled promise in ${value} ms`,
+        messageColor: '#FFFFFF',
         backgroundColor: '#59A10D',
         position: 'topRight',
-        iconUrl: iconOk,
       });
     })
-    .catch(delay => {
-      iziToast.error({
-        message: `Rejected promise in ${delay}ms`,
-        messageColor: '#FFF',
+    .catch(value => {
+      iziToast.show({
+        message: `❌ Rejected promise in ${value} ms`,
+        messageColor: '#FFFFFF',
         backgroundColor: '#EF4040',
         position: 'topRight',
-        iconUrl: iconClose,
       });
     });
+  form.reset();
 });
