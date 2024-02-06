@@ -4,10 +4,8 @@ import "izitoast/dist/css/iziToast.min.css";
 document.getElementById('promise-form').addEventListener('submit', function(event) {
     event.preventDefault();
 
-    // Отримання значення затримки та перетворення його на число
     const delay = Number(event.target.elements['delay'].value);
     
-    // Отримання обраного значення стану
     const state = document.querySelector('input[name="state"]:checked').value;
 
     createPromise(delay, state)
