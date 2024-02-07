@@ -3,58 +3,60 @@ import 'flatpickr/dist/flatpickr.min.css';
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 
-const btnStart = document.querySelector('button');
-const input = document.querySelector('input');
-const day = document.querySelector('.value[ data-days]');
-const hour = document.querySelector('.value[ data-hours]');
-const minute = document.querySelector('.value[ data-minutes]');
-const second = document.querySelector('.value[ data-seconds]');
-btnStart.disabled = true;
-let date = Date.now();
+const startBtn = document.querySelector('.js-button');
+const input = document.querySelector('#datetime-picker');
+const day = document.querySelector('.value[ data-days ]');
+const hour = document.querySelector('.value[ data-hours ]');
+const minute = document.querySelector('.value[ data-minutes ]');
+const second = document.querySelector('.value[ data-seconds ]');
+startBtn.setAttribute('disabled', '');
+let diff;
 let userSelectedDate;
-let difference;
-let setIntervalId;
 const options = {
   enableTime: true,
   time_24hr: true,
   defaultDate: new Date(),
   minuteIncrement: 1,
   onClose(selectedDates) {
-    // console.log(selectedDates[0]);
-    userSelectedDate = selectedDates[0];
-    if (userSelectedDate < Date.now()) {
-      iziToast.show({
+      userSelectedDate = selectedDates[0];
+      if (userSelectedDate < Date.now()) {
+        startBtn.setAttribute('disabled', '');
+        startBtn.style.backgroundColor = '#CFCFCF';
+          startBtn.style.color = '##989898';
+          
+    iziToast.show({
         message: 'Please choose a date in the future',
         messageColor: '#FFFFFF',
-        backgroundColor: '#B51B1B',
+        backgroundColor: '#EF4040',
         position: 'topRight',
-      });
-    } else {
-      btnStart.disabled = false;
-      btnStart.style.background = '#4E75FF';
-      btnStart.style.color = '#FFF';
-    }
+    });          
+} else {
+        startBtn.removeAttribute('disabled');
+        startBtn.style.backgroundColor = '#4E75FF';
+        startBtn.style.color = '#FFFFFF';  
+};
   },
 };
 
-flatpickr('#datetime-picker', options);
+flatpickr(input, options);
 
-btnStart.addEventListener('click', e => {
-  btnStart.disabled = true;
-  input.disabled = true;
-  btnStart.style.background = '#CFCFCF';
-  btnStart.style.color = '#989898';
-  difference = userSelectedDate - Date.now();
-  timerNumber(convertMs(difference));
-  setIntervalId = setInterval(() => {
-    difference -= 1000;
-    timerNumber(convertMs(difference));
-    stopTimer(difference);
-  }, 1000);
-});
+startBtn.addEventListener('click', () => {
+    startBtn.setAttribute('disabled', '');
+    input.setAttribute('disabled', '');
+    startBtn.style.backgroundColor = '#CFCFCF';
+    startBtn.style.color = '##989898';
+    diff = userSelectedDate - Date.now();
+     timerNumber(convertMs(diff));
+    const intervalId = setInterval(() => {
+        diff -= 1000;
+        timerNumber(convertMs(diff));
+        if (diff <= 1000) {
+            clearInterval(intervalId);
+        }
+    }, 1000);
+})
 
 function convertMs(ms) {
-  // Number of milliseconds per unit of time
   const second = 1000;
   const minute = second * 60;
   const hour = minute * 60;
@@ -69,18 +71,17 @@ function convertMs(ms) {
 }
 
 function timerNumber({ days, hours, minutes, seconds }) {
-  day.textContent = `${addLeadingZero(days)}`;
-  hour.textContent = `${addLeadingZero(hours)}`;
-  minute.textContent = `${addLeadingZero(minutes)}`;
-  second.textContent = `${addLeadingZero(seconds)}`;
-}
-
-function stopTimer(difference) {
-  if (difference <= 1000) {
-    clearInterval(setIntervalId);
-  }
+    day.textContent = `${addLeadingZero(days)}`;
+    hour.textContent = `${addLeadingZero(hours)}`;
+    minute.textContent = `${addLeadingZero(minutes)}`;
+    second.textContent = `${addLeadingZero(seconds)}`;
 }
 
 function addLeadingZero(value) {
-  return value.toString().padStart(2, '0');
+    return value.toString().padStart(2, '0');
 }
+
+
+
+
+
